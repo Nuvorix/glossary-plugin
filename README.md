@@ -73,8 +73,13 @@ A custom glossary plugin for WordPress, offering tooltip functionality, an archi
 - **Tooltip Overflow**:  
   On mobile devices, if the tooltip word is positioned too far to the right, it may become a long vertical text box instead of displaying correctly.
 
+## How and why this plugin was created
+Please check out this article on our blog to see how and why I decided to make my own plugin:  
+[https://www.nuvorix.com/2024/10/09/free-wordpress-glossary-plugin-chatgpt4/](https://www.nuvorix.com/2024/10/09/free-wordpress-glossary-plugin-chatgpt4/)
+
 ## License
 This project is licensed under the GPLv3 License - see the [LICENSE](LICENSE) file for details.
+
 
 ## Contribution and Modification
 You are free to use, modify, and distribute this plugin as you wish, as long as it remains open-source. Any modifications or derivative works must also be released under the same GPLv3 License. This ensures that the community can continue to benefit from and build upon this work.
