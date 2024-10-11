@@ -24,6 +24,31 @@ A custom glossary plugin for WordPress, offering tooltip functionality, an archi
 - **Nonce Verification**:  
   Uses nonce verification to secure form submissions, ensuring that requests are intentional and prevent CSRF attacks.
 
+## How Glossary Terms are Stored and Retrieved
+- **Storage in Database:**
+  - Glossary terms are stored as custom post types in the WordPress `wp_posts` table. Each term is saved with a `post_type` of `glossary` to distinguish them from other post types like `post` (blog posts) or `page`.
+  - Additional information such as the tooltip text and abbreviation full form is stored as post metadata in the `wp_postmeta` table, linked to each glossary term using its `post_id`.
+  - Examples of metadata storage:
+    - Tooltip text is stored with the meta_key `_tooltip_text`.
+    - Abbreviation full form is stored with the meta_key `_abbreviation_full_form`.
+
+- **Retrieval of Glossary Terms:**
+  - Glossary terms are fetched using a `WP_Query` that targets posts with a `post_type` of `glossary`.
+  - Example:
+    ```php
+    $glossary_terms = new WP_Query(array(
+        'post_type' => 'glossary',
+        'posts_per_page' => -1,
+        'orderby' => 'title',
+        'order' => 'ASC',
+    ));
+    ```
+  - Tooltip text and abbreviation full form are retrieved using `get_post_meta()`:
+    ```php
+    $tooltip_text = get_post_meta($term->ID, '_tooltip_text', true);
+    $abbreviation_full_form = get_post_meta($term->ID, '_abbreviation_full_form', true);
+    ```
+
 ## Installation
 1. **Download the Plugin**:  
    Download the plugin zip file from this repository.
