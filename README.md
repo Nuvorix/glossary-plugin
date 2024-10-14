@@ -50,12 +50,15 @@ $glossary_terms = new WP_Query(array(
     'orderby' => 'title',
     'order' => 'ASC',
 ));
+```
 
 Tooltip text and abbreviation full form are retrieved using `get_post_meta()`:
 
-```php
+```
+php
 $tooltip_text = get_post_meta($term->ID, '_tooltip_text', true);
 $abbreviation_full_form = get_post_meta($term->ID, '_abbreviation_full_form', true);
+```
 
 ## Installation
 
