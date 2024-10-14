@@ -1,4 +1,4 @@
-# Glossary Plugin Fixed Tooltip with Cache
+# Glossary Plugin Tooltip with Cache and Archive Page
 
 A custom glossary plugin for WordPress, offering tooltip functionality, an archive page, caching, and more.
 
@@ -26,6 +26,9 @@ A custom glossary plugin for WordPress, offering tooltip functionality, an archi
 
 - **Nonce Verification**:  
   Uses nonce verification to secure form submissions, ensuring that requests are intentional and prevent CSRF attacks.
+
+- **Only Administrators Can Create Glossaries**
+  Only administrators are allowed to create, edit, or delete glossary terms.
 
 ## How Glossary Terms are Stored and Retrieved
 
