@@ -2,7 +2,7 @@
 /*
 Plugin Name: Glossary Plugin Optimized
 Description: A custom glossary plugin with tooltip, archive functionality, caching, and improved features.
-Version: 2.2
+Version: 2.3
 Author: ChatGPT & Nuvorix.com
 */
 
@@ -19,6 +19,20 @@ function create_glossary_post_type() {
         'search_items'          => __( 'Search Glossary Terms', 'text_domain' ),
         'not_found'             => __( 'No Glossary Terms found.', 'text_domain' ),
     );
+
+    // Set custom capabilities for glossary post type
+    $capabilities = array(
+        'publish_posts' => 'manage_options', // Only administrators can publish posts
+        'edit_posts' => 'manage_options', // Only administrators can edit posts
+        'edit_others_posts' => 'manage_options', // Only administrators can edit others' posts
+        'delete_posts' => 'manage_options', // Only administrators can delete posts
+        'delete_others_posts' => 'manage_options', // Only administrators can delete others' posts
+        'read_private_posts' => 'read', // Any logged-in user can read private posts
+        'edit_post' => 'manage_options',
+        'delete_post' => 'manage_options',
+        'read_post' => 'read', // Any logged-in user can read posts
+    );
+
     $args = array(
         'label'                 => __( 'Glossary', 'text_domain' ),
         'labels'                => $labels,
@@ -27,6 +41,9 @@ function create_glossary_post_type() {
         'show_ui'               => true,
         'has_archive'           => true,
         'rewrite'               => array('slug' => 'glossary'),
+        'capability_type'       => 'post',
+        'capabilities'          => $capabilities,  // Apply custom capabilities
+        'map_meta_cap'          => true,  // Map meta capabilities for more control
     );
     register_post_type( 'glossary', $args );
 }
@@ -80,7 +97,6 @@ add_action('save_post', 'glossary_save_meta_box_data');
 
 // Add Tooltip Functionality with Caching, excluding Glossary archive pages
 function glossary_tooltip_filter($content) {
-    // Avoid tooltips on glossary archive pages and single glossary items
     if (is_post_type_archive('glossary') || is_singular('glossary')) {
         return $content;
     }
@@ -143,4 +159,3 @@ function clear_glossary_term_cache($post_id) {
     }
 }
 add_action('save_post', 'clear_glossary_term_cache');
-?>
