@@ -208,4 +208,3 @@ function remove_glossary_post_navigation() {
     }
 }
 add_action('wp', 'remove_glossary_post_navigation');
-?>
