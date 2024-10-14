@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Glossary Plugin Optimized
+Plugin Name: Glossary Plugin
 Description: A custom glossary plugin with tooltip, archive functionality, caching, and improved features.
-Version: 2.3
+Version: 2.4
 Author: ChatGPT & Nuvorix.com
 */
 
@@ -22,15 +22,15 @@ function create_glossary_post_type() {
 
     // Set custom capabilities for glossary post type
     $capabilities = array(
-        'publish_posts' => 'manage_options', // Only administrators can publish posts
-        'edit_posts' => 'manage_options', // Only administrators can edit posts
-        'edit_others_posts' => 'manage_options', // Only administrators can edit others' posts
-        'delete_posts' => 'manage_options', // Only administrators can delete posts
-        'delete_others_posts' => 'manage_options', // Only administrators can delete others' posts
-        'read_private_posts' => 'read', // Any logged-in user can read private posts
-        'edit_post' => 'manage_options',
-        'delete_post' => 'manage_options',
-        'read_post' => 'read', // Any logged-in user can read posts
+        'publish_posts' => 'publish_glossaries', // Custom capability for publishing glossary posts
+        'edit_posts' => 'edit_glossaries', // Custom capability for editing glossary posts
+        'edit_others_posts' => 'edit_others_glossaries', // Custom capability for editing others' glossary posts
+        'delete_posts' => 'delete_glossaries', // Custom capability for deleting glossary posts
+        'delete_others_posts' => 'delete_others_glossaries', // Custom capability for deleting others' glossary posts
+        'read_private_posts' => 'read_private_glossaries', // Custom capability for reading private glossary posts
+        'edit_post' => 'edit_glossary',
+        'delete_post' => 'delete_glossary',
+        'read_post' => 'read_glossary',
     );
 
     $args = array(
@@ -41,7 +41,7 @@ function create_glossary_post_type() {
         'show_ui'               => true,
         'has_archive'           => true,
         'rewrite'               => array('slug' => 'glossary'),
-        'capability_type'       => 'post',
+        'capability_type'       => 'glossary', // Custom capability type for glossary
         'capabilities'          => $capabilities,  // Apply custom capabilities
         'map_meta_cap'          => true,  // Map meta capabilities for more control
     );
