@@ -8,6 +8,10 @@ Author: ChatGPT & Nuvorix.com
 
 // Shortcode for Glossary Archive Page
 function glossary_archive_shortcode() {
+    if (!current_user_can('read')) { // Check if the user has permission to view glossary
+        return '<p>You do not have permission to view this content.</p>';
+    }
+
     try {
         ob_start();
 
@@ -86,15 +90,17 @@ function glossary_archive_shortcode() {
             }
             echo '</ul>';
 
-            // Display pagination links
-            echo paginate_links(array(
-                'total' => $glossary_terms->max_num_pages ?? 1,
-                'current' => $paged,
-            ));
+            // Display pagination links, ensuring $glossary_terms is valid
+            if (isset($glossary_terms) && $glossary_terms instanceof WP_Query && $glossary_terms->max_num_pages > 1) {
+                echo paginate_links(array(
+                    'total' => $glossary_terms->max_num_pages,
+                    'current' => $paged,
+                ));
 
-            // Display a message if there are more terms available
-            if ($glossary_terms->max_num_pages > 1) {
-                echo '<p>There are more terms available. Please use the search feature to find a specific word or term.</p>';
+                // Display a message if there are more terms available
+                if ($glossary_terms->max_num_pages > 1) {
+                    echo '<p>There are more terms available. Please use the search feature to find a specific word or term.</p>';
+                }
             }
         } else {
             echo '<p>No terms found.</p>';
@@ -108,66 +114,61 @@ function glossary_archive_shortcode() {
 }
 add_shortcode('glossary_archive', 'glossary_archive_shortcode');
 
-// Add styles for glossary archive page and hide post navigation
+// Add styles for glossary archive page
 function glossary_archive_styles() {
-    if (is_page_template('glossary-archive.php') || is_singular('glossary')) {
-        echo '<style>
+    echo '<style>
         .post-navigation, .nav-links {
             display: none !important;
         }
-        </style>';
-    }
-
-    echo '<style>
-    .glossary-alphabet {
-        margin-bottom: 20px;
-        text-align: center; /* Center the alphabet */
-        font-size: 20px; /* Make the text larger */
-    }
-    .glossary-letter {
-        margin: 0 5px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 22px;
-        color: #0073aa;
-        transition: color 0.3s ease;
-    }
-    .glossary-letter.active {
-        font-weight: bold;
-        text-decoration: underline; /* Underline active letter */
-    }
-    .glossary-letter:hover {
-        color: #333;
-    }
-    .glossary-search-form {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .glossary-search-form input[type="text"] {
-        width: 60%;
-        padding: 10px;
-        margin-right: 10px;
-    }
-    .glossary-search-form button {
-        padding: 10px 20px;
-    }
-    .glossary-list {
-        list-style: none;
-        padding: 0;
-        text-align: left;
-    }
-    .glossary-list li {
-        margin: 5px 0;
-    }
-    .glossary-list a {
-        text-decoration: none;
-        font-size: 20px;
-        color: inherit;
-        transition: color 0.3s ease;
-    }
-    .glossary-list a:hover {
-        color: #0073aa;
-    }
+        .glossary-alphabet {
+            margin-bottom: 20px;
+            text-align: center; /* Center the alphabet */
+            font-size: 20px; /* Make the text larger */
+        }
+        .glossary-letter {
+            margin: 0 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 22px;
+            color: #0073aa;
+            transition: color 0.3s ease;
+        }
+        .glossary-letter.active {
+            font-weight: bold;
+            text-decoration: underline; /* Underline active letter */
+        }
+        .glossary-letter:hover {
+            color: #333;
+        }
+        .glossary-search-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .glossary-search-form input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        .glossary-search-form button {
+            padding: 10px 20px;
+        }
+        .glossary-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        .glossary-list li {
+            margin: 5px 0;
+        }
+        .glossary-list a {
+            text-decoration: none;
+            font-size: 20px;
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+        .glossary-list a:hover {
+            color: #0073aa;
+        }
     </style>';
 }
 add_action('wp_head', 'glossary_archive_styles');
