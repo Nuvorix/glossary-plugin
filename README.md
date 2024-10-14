@@ -27,8 +27,11 @@ A custom glossary plugin for WordPress, offering tooltip functionality, an archi
 - **Nonce Verification**:  
   Uses nonce verification to secure form submissions, ensuring that requests are intentional and prevent CSRF attacks.
 
-- **Only Administrators Can Create Glossaries**
-  Only administrators are allowed to create, edit, or delete glossary terms.
+- **Escaping Output to Prevent XSS**:
+  Tooltip text and other glossary data are escaped before being displayed in the browser, preventing XSS attacks.
+
+- **Administrator-Only Glossary Management**:
+  Only administrators are allowed to create, edit, or delete glossary terms, ensuring secure control over glossary entries.
 
 ## How Glossary Terms are Stored and Retrieved
 
