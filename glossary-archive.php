@@ -117,12 +117,12 @@ add_shortcode('glossary_archive', 'glossary_archive_shortcode');
 
 // Cache individual glossary terms and limit the total number of cached items to 1000
 function cache_glossary_term($term_id) {
-    // Hent cache-listen fra transients
+    // Fetch cache-list from transients
     $cache_list = get_transient('glossary_cache_list') ?: array();
 
-    // Hent glossary-term hvis det ikke allerede er cachet
+    // Fetch glossary term if it's not already cached
     if (!in_array($term_id, $cache_list)) {
-        // Cache term med 72 timers varighet
+        // Cache term with 72 hours expiration
         $term_data = array(
             'title' => get_the_title($term_id),
             'link' => get_permalink($term_id),
@@ -131,17 +131,17 @@ function cache_glossary_term($term_id) {
 
         set_transient('glossary_term_' . $term_id, $term_data, 72 * HOUR_IN_SECONDS);
 
-        // Legg til term_id i cache-listen
+        // Add term_id to cache list
         $cache_list[] = $term_id;
 
-        // Sjekk om antallet cachede terms overstiger 1000
+        // Check if the number of cached terms exceeds 1000
         if (count($cache_list) > 1000) {
-            // Fjern det eldste term fra cache-listen
+            // Remove the oldest cached term
             $oldest_term_id = array_shift($cache_list);
             delete_transient('glossary_term_' . $oldest_term_id);
         }
 
-        // Oppdater cache-listen
+        // Update the cache list
         set_transient('glossary_cache_list', $cache_list, 72 * HOUR_IN_SECONDS);
     }
 }
