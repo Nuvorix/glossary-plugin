@@ -3,12 +3,12 @@
 Plugin Name: Glossary Plugin
 Description: A custom glossary plugin with tooltip, archive functionality, caching, and improved features.
 Version: 1.0 (Stable Release)
-Requires at least 5.0
-Tested up to 6.6.2
+Requires at least: 5.0
+Tested up to: 6.6.2
 Author: ChatGPT & Nuvorix.com
 */
 
-// Forhindre direkte tilgang til filen
+// Prevent direct file access
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
@@ -57,8 +57,8 @@ add_action( 'init', 'create_glossary_post_type' );
 
 // Add Meta Boxes for Tooltip and Abbreviation Full Form
 function glossary_add_meta_box() {
-    add_meta_box('glossary_tooltip_text', __('Tooltip Text (300 characters)', 'text_domain'), 'glossary_meta_box_callback', 'glossary', 'normal', 'high');
-    add_meta_box('glossary_abbreviation_full_form', __('Abbreviation Full Form', 'text_domain'), 'glossary_abbreviation_meta_box_callback', 'glossary', 'normal', 'high');
+    add_meta_box('glossary_tooltip_text', __('Tooltip Text (300 characters) - Shown when a user hovers over the term', 'text_domain'), 'glossary_meta_box_callback', 'glossary', 'normal', 'high');
+    add_meta_box('glossary_abbreviation_full_form', __('Abbreviation Full Form - Shown in parentheses on the archive page', 'text_domain'), 'glossary_abbreviation_meta_box_callback', 'glossary', 'normal', 'high');
 }
 add_action('add_meta_boxes', 'glossary_add_meta_box');
 
@@ -103,6 +103,7 @@ function glossary_save_meta_box_data($post_id) {
 
     // Clear cached glossary terms after saving
     wp_cache_delete('glossary_terms_cache', 'glossary');
+    error_log("Glossary cache cleared after post save for post ID: " . $post_id);
 }
 add_action('save_post', 'glossary_save_meta_box_data');
 
@@ -142,8 +143,11 @@ function glossary_tooltip_filter($content) {
     // Cache based on content hash
     $cache_key = 'glossary_terms_cache_' . md5($content);
     $terms = wp_cache_get($cache_key, 'glossary');
-    
+
+    // Logging cache status
     if ($terms === false) {
+        error_log("Glossary cache not found, generating new cache for content hash: " . md5($content));
+
         $all_terms = get_posts(array(
             'post_type' => 'glossary',
             'posts_per_page' => -1,
@@ -155,21 +159,31 @@ function glossary_tooltip_filter($content) {
         foreach ($all_terms as $term) {
             $term_title = $term->post_title;
             if (stripos($content, $term_title) !== false) {
-                $terms_to_cache[] = $term; // Add to the cacheable terms if found in content
+                $terms_to_cache[] = array(
+                    'title' => $term->post_title,
+                    'link' => get_permalink($term->ID),
+                    'ID' => $term->ID // Added term ID for later use
+                );
             }
         }
 
         // Cache the relevant terms found in the content
         wp_cache_set($cache_key, $terms_to_cache, 'glossary', 72 * HOUR_IN_SECONDS);
+        set_transient('glossary_cache_list', $terms_to_cache, 72 * HOUR_IN_SECONDS);  // Update cache list transient
         $terms = $terms_to_cache;
+
+        // Log cache creation
+        error_log("Glossary cache created for content hash: " . md5($content));
+    } else {
+        error_log("Glossary cache found for content hash: " . md5($content));
     }
 
     // Apply tooltips for each relevant term
-    foreach ($terms as $term) {
-        $term_title = $term->post_title;
-        $tooltip_text = get_post_meta($term->ID, '_tooltip_text', true) ?: 'No description available';
+    foreach ($terms as $term_data) {
+        $term_title = $term_data['title'];
+        $tooltip_text = get_post_meta($term_data['ID'], '_tooltip_text', true) ?: 'No description available'; // Fetch the tooltip text
         $tooltip_text = esc_attr(strip_tags($tooltip_text)); // Ensure tooltip text is safe
-        $link = get_permalink($term->ID);
+        $link = $term_data['link'];
         $tooltip = '<span class="glossary-tooltip" data-tooltip="' . esc_js($tooltip_text) . '">' . esc_html($term_title) . '</span>';
         $pattern = '/(?<!\w)(' . preg_quote($term_title, '/') . ')(?!\w)(?![^<]*>)/';
         $replacement = '<a href="' . esc_url($link) . '" target="_blank">' . $tooltip . '</a>';
@@ -205,18 +219,35 @@ function glossary_enqueue_assets() {
 }
 add_action('wp_head', 'glossary_enqueue_assets');
 
-// Forcefully Add and Check Glossary Capabilities for Administrator
+// Forcefully Add and Check Glossary Capabilities for Administrator and Editor
 function ensure_admin_glossary_capabilities() {
-    $role = get_role('administrator');
-    if ($role) {
-        $capabilities = array(
-            'publish_glossaries', 'edit_glossaries', 'edit_others_glossaries',
-            'delete_glossaries', 'delete_others_glossaries', 'read_private_glossaries',
-            'edit_glossary', 'delete_glossary', 'read_glossary'
-        );
-        foreach ($capabilities as $cap) {
-            if (!$role->has_cap($cap)) {
-                $role->add_cap($cap);
+    $roles = ['administrator', 'editor'];
+    $capabilities = array(
+        'publish_glossaries', 'edit_glossaries', 'edit_others_glossaries',
+        'delete_glossaries', 'delete_others_glossaries', 'read_private_glossaries',
+        'edit_glossary', 'delete_glossary', 'read_glossary'
+    );
+
+    foreach ($roles as $role_name) {
+        $role = get_role($role_name);
+        if ($role) {
+            foreach ($capabilities as $cap) {
+                if (!$role->has_cap($cap)) {
+                    $role->add_cap($cap);
+                }
+            }
+        }
+    }
+
+    // Optionally, remove glossary capabilities from lower roles
+    $lower_roles = ['author', 'contributor', 'subscriber'];
+    foreach ($lower_roles as $role_name) {
+        $role = get_role($role_name);
+        if ($role) {
+            foreach ($capabilities as $cap) {
+                if ($role->has_cap($cap)) {
+                    $role->remove_cap($cap); // Remove capability from lower roles
+                }
             }
         }
     }
@@ -247,6 +278,79 @@ add_filter('map_meta_cap', 'glossary_map_meta_cap', 10, 4);
 function clear_glossary_term_cache($post_id) {
     if (get_post_type($post_id) == 'glossary') {
         wp_cache_delete('glossary_terms_cache', 'glossary');
+        error_log("Glossary cache cleared for post ID: " . $post_id);
     }
 }
 add_action('save_post', 'clear_glossary_term_cache');
+
+// Add Glossary Cache and Glossary Info as submenus under Glossary
+function glossary_add_submenu_pages() {
+    add_submenu_page(
+        'edit.php?post_type=glossary',  // Parent slug (Glossary menu)
+        __('Glossary Cache', 'text_domain'),  // Page title
+        __('Glossary Cache', 'text_domain'),  // Menu title
+        'manage_options',  // Capability (administrator only)
+        'glossary_cache',  // Menu slug
+        'glossary_cache_page_callback'  // Callback function for displaying the page
+    );
+
+    add_submenu_page(
+        'edit.php?post_type=glossary',  // Parent slug (Glossary menu)
+        __('Glossary Info', 'text_domain'),  // Page title
+        __('Glossary Info', 'text_domain'),  // Menu title
+        'manage_options',  // Capability (administrator only)
+        'glossary_info',  // Menu slug
+        'glossary_info_page_callback'  // Callback function for displaying the page
+    );
+}
+add_action('admin_menu', 'glossary_add_submenu_pages');
+
+// Callback function for the Cache page
+function glossary_cache_page_callback() {
+    echo '<div class="wrap">';
+    echo '<h1>' . esc_html__('Cached Glossary Tooltips', 'text_domain') . '</h1>';
+    
+    $cache_list = get_transient('glossary_cache_list');
+
+    if ($cache_list && is_array($cache_list)) {
+        $total_cached = count($cache_list);
+        echo '<p>' . sprintf(esc_html__('%s tooltips cached out of 1000', 'text_domain'), $total_cached) . '</p>';
+        echo '<ul>';
+
+        // Adjusting to handle the data correctly
+        foreach ($cache_list as $term) {
+            $term_title = esc_html($term['title']);
+            $term_link = esc_url($term['link']);
+            echo '<li><a href="' . $term_link . '" target="_blank">' . $term_title . '</a></li>';
+        }
+
+        echo '</ul>';
+    } else {
+        echo '<p>' . esc_html__('No cached glossary tooltips found.', 'text_domain') . '</p>';
+    }
+
+    // Clear Cache Button
+    echo '<form method="post">';
+    echo '<input type="submit" name="clear_glossary_cache" class="button button-primary" value="' . esc_attr__('Clear Cache', 'text_domain') . '">';
+    echo '</form>';
+
+    // Handle Cache Clearing
+    if (isset($_POST['clear_glossary_cache'])) {
+        delete_transient('glossary_cache_list');
+        error_log("Glossary cache cleared manually via admin page.");
+        echo '<p>' . esc_html__('Cache cleared successfully.', 'text_domain') . '</p>';
+    }
+
+    echo '</div>';
+}
+
+// Callback function for the Info page
+function glossary_info_page_callback() {
+    $glossary_count = wp_count_posts('glossary')->publish;
+    echo '<div class="wrap">';
+    echo '<h1>' . esc_html__('Glossary Info', 'text_domain') . '</h1>';
+    echo '<p>' . esc_html__('To use the Glossary plugin, insert the following shortcode on an archive page:', 'text_domain') . '</p>';
+    echo '<code>[glossary_archive]</code>';
+    echo '<p>' . sprintf(esc_html__('There are currently %s glossary terms available.', 'text_domain'), $glossary_count) . '</p>';
+    echo '</div>';
+}
