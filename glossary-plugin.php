@@ -47,7 +47,7 @@ function create_glossary_post_type() {
         'show_ui'               => true,
         'has_archive'           => true,
         'rewrite'               => array('slug' => 'glossary'),
-        'capability_type'       => 'glossary',
+        'capability_type'       => 'post',
         'capabilities'          => $capabilities,
         'map_meta_cap'          => true,
     );
