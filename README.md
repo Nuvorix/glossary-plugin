@@ -67,11 +67,11 @@ $tooltip_text = get_post_meta($term->ID, '_tooltip_text', true);
 $abbreviation_full_form = get_post_meta($term->ID, '_abbreviation_full_form', true);
 ```
 
-## Changelog:
-** Added descriptions to new text fields (Tooltip text & Abbreviation Full Form)**
-** Tooltip fallback: If a glossary term does not have a tooltip, a default message ("No description available") is provided**
-** Added Glossary Cache Page: View cached glossary tooltips. Option to manually clear the cache.**
-** Added Glossary Info Page: Displays the total number of glossary terms. Shows how to use the plugin (shortcode instructions).**
+## Changelog (10.15.24):
+1. ** Added descriptions to new text fields (Tooltip text & Abbreviation Full Form)**
+2. ** Tooltip fallback: If a glossary term does not have a tooltip, a default message ("No description available") is provided**
+3. ** Added Glossary Cache Page: View cached glossary tooltips. Option to manually clear the cache.**
+4. ** Added Glossary Info Page: Displays the total number of glossary terms. Shows how to use the plugin (shortcode instructions).**
 
 ## Installation
 
