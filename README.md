@@ -10,11 +10,13 @@ A custom glossary plugin for WordPress, offering tooltip functionality, an archi
 - **Tooltips with Abbreviation Support**:  
   Displays brief descriptions in tooltips when hovering over terms, with the option to show full-form abbreviations in parentheses.
 
-- **Caching for Improved Performance**:  
-  Glossary terms are cached for faster loading and a smoother user experience.
-
 - **Responsive Design**:  
   Works well on both desktop and mobile devices, ensuring accessibility for all users.
+
+- **Caching of Tooltip text and Archive articles**:  
+  Tooltip text and archive articles are cached for 72 hours. For example, if a visitor views a page containing 27 different tooltips, all 27 tooltip texts will be cached. Once the cache reaches 1,000 tooltip texts, the oldest entries will be deleted to make room for new ones. After 72 hours, the entire cache will
+  expire and be rebuilt. This ensures that your site's RAM and disk space won't be overwhelmed by cached data.
+  The plugin utilizes WordPress's native Transient API for caching, making it capable of handling thousands of visitors. If your website attracts a very large number of visitors, consider using caching solutions like Redis or Memcached for enhanced performance.
 
 ## Security Features
 
