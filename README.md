@@ -4,6 +4,7 @@ A custom glossary plugin for WordPress, offering tooltip functionality, an archi
 
 ## Please note
 If you plan to create multiple glossaries or expect significant traffic, we recommend using a caching plugin to enhance performance.
+E.g. LiteSpeed Cache
 
 ## Features
 
