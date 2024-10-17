@@ -12,7 +12,7 @@ E.g. LiteSpeed Cache
   A dedicated page with search functionality and alphabetical filtering, making it easy for users to find glossary terms.
 
 - **Tooltips with Abbreviation Support**:  
-  Displays brief descriptions in tooltips when hovering over terms, with the option to show full-form abbreviations in parentheses.
+  Displays brief descriptions in tooltips when hovering over terms in posts or pages, with the option to show full-form abbreviations in parentheses in archive page.
 
 - **Responsive Design**:  
   Works well on both desktop and mobile devices, ensuring accessibility for all users.
