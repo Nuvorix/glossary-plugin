@@ -1,6 +1,6 @@
-# Glossary Plugin Tooltip with Cache and Archive Page
+# Glossary Plugin Tooltip with an Archive Page
 
-A custom glossary plugin for WordPress, offering tooltip functionality, an archive page, caching, and more.
+A custom glossary plugin for WordPress, offering tooltip functionality, an archive page, and more.
 
 ## Features
 
@@ -12,11 +12,6 @@ A custom glossary plugin for WordPress, offering tooltip functionality, an archi
 
 - **Responsive Design**:  
   Works well on both desktop and mobile devices, ensuring accessibility for all users.
-
-- **Caching of Tooltip text and Archive articles**:  
-  Tooltip text and archive articles are cached for 72 hours. For example, if a visitor views a page containing 27 different tooltips, all 27 tooltip texts will be cached. Once the cache reaches 1,000 tooltip texts, the oldest entries will be deleted to make room for new ones. After 72 hours, the entire cache will
-  expire and be rebuilt. This ensures that your site's RAM and disk space won't be overwhelmed by cached data.
-  The plugin utilizes WordPress's native Transient API for caching, making it capable of handling thousands of visitors. If your website attracts a very large number of visitors, consider using caching solutions like Redis or Memcached for enhanced performance.
 
 ## Security Features
 
@@ -67,12 +62,6 @@ $tooltip_text = get_post_meta($term->ID, '_tooltip_text', true);
 $abbreviation_full_form = get_post_meta($term->ID, '_abbreviation_full_form', true);
 ```
 
-## Changelog (10.15.24):
-1. Added descriptions to new text fields (Tooltip text & Abbreviation Full Form)
-2. Tooltip fallback: If a glossary term does not have a tooltip, a default message ("No description available") is provided
-3. Added Glossary Cache Page: View cached glossary tooltips. Option to manually clear the cache.
-4. Added Glossary Info Page: Displays the total number of glossary terms. Shows how to use the plugin (shortcode instructions).
-
 ## Installation
 
 1. **Download the Plugin**:  
@@ -98,7 +87,7 @@ $abbreviation_full_form = get_post_meta($term->ID, '_abbreviation_full_form', tr
 ## Known Bugs or Errors
 
 - **Tooltip Overflow**:  
-  On mobile devices, if the tooltip word is positioned too far to the right, it may become a long vertical text box instead of displaying correctly.
+  If the tooltip word is positioned too far to the right, it may become a long vertical text box instead of displaying correctly.
 
 ## How and Why This Plugin Was Created
 
