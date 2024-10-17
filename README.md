@@ -2,6 +2,9 @@
 
 A custom glossary plugin for WordPress, offering tooltip functionality, an archive page, and more.
 
+## Please note
+If you plan to create multiple glossaries or expect significant traffic, we recommend using a caching plugin to enhance performance.
+
 ## Features
 
 - **Custom Glossary Archive Page**:  
@@ -61,6 +64,9 @@ Tooltip text and abbreviation full form are retrieved using `get_post_meta()`:
 $tooltip_text = get_post_meta($term->ID, '_tooltip_text', true);
 $abbreviation_full_form = get_post_meta($term->ID, '_abbreviation_full_form', true);
 ```
+
+## Changelog (latest 10.17.24)
+* Separated CSS from PHP scripts.
 
 ## Installation
 
